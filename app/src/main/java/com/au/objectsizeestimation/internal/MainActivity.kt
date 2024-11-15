@@ -5,15 +5,25 @@ import android.os.Bundle
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts.RequestPermission
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
 import com.au.library_mvvm.ComposeBaseViewModelActivity
 import com.au.library_ui_compose.theme.ObjectSizeEstimationAppTheme
 import com.au.library_ui_compose.ui.CameraPreview
@@ -50,13 +60,42 @@ internal class MainActivity : ComposeBaseViewModelActivity<MainViewModel>(MainVi
                                     modifier = Modifier.fillMaxSize(),
                                     onDraw = {
                                         drawRect(
-                                            style = Stroke(width = 2f),
-                                            topLeft = Offset(classification.left, classification.top),
                                             color = Color.Red,
-                                            size = Size(classification.width, classification.height),
+                                            topLeft = Offset(
+                                                x = classification.boundingBox.left,
+                                                y = classification.boundingBox.top,
+                                            ),
+                                            size = Size(
+                                                classification.boundingBox.width(),
+                                                classification.boundingBox.height()
+                                            ),
+                                            style = Stroke(
+                                                width = 10f,
+                                            )
                                         )
                                     }
                                 )
+
+                                Column(
+                                    modifier = Modifier.align(Alignment.BottomCenter).background(Color.White).fillMaxWidth(),
+                                    verticalArrangement = Arrangement.Bottom,
+                                ) {
+                                    Text(
+                                        text = classification.label,
+                                        modifier = Modifier.fillMaxWidth(),
+                                        textAlign = TextAlign.Center,
+                                        color = Color.Red,
+                                    )
+
+                                    Spacer(modifier = Modifier.height(8.dp))
+
+                                    Text(
+                                        text = classification.score.toString(),
+                                        modifier = Modifier.fillMaxWidth(),
+                                        textAlign = TextAlign.Center,
+                                        color = Color.Red,
+                                    )
+                                }
                             }
                         }
                     }

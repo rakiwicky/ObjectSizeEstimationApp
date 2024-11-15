@@ -13,7 +13,7 @@ import javax.inject.Inject
 internal class MainViewModel @Inject constructor(
     private val tensorFlowInteractor: TensorFlowInteractor,
     private val permissionHelper: PermissionHelper,
-    private val detectionMapper: DetectionMapper,
+    private val detectionDetailsMapper: DetectionDetailsMapper,
     viewStateFactory: MainViewState.Factory,
 ) : BaseViewModel() {
 
@@ -50,13 +50,16 @@ internal class MainViewModel @Inject constructor(
     private fun onImageAnalysis(imageProxy: ImageProxy) {
         viewModelScope.launch {
             try {
-                val listOfDetections = tensorFlowInteractor.detectObjects(imageProxy.toBitmap())
+                val bitmap = imageProxy.toBitmap()
+                val listOfDetections = tensorFlowInteractor.detectObjects(bitmap)
 
                 withContext(Dispatchers.Main) {
                     viewState.moveTo(
                         TargetState.Camera(
                             onImageAnalysis = ::onImageAnalysis,
-                            listDetected = detectionMapper.create(listOfDetections)
+                            listDetected = detectionDetailsMapper.create(
+                                listOfDetections,
+                            )
                         )
                     )
                 }

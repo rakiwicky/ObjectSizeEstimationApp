@@ -1,8 +1,9 @@
 package com.au.objectsizeestimation.internal.ui
 
+import android.graphics.RectF
+
 internal data class Classification(
-    val width: Float,
-    val height: Float,
-    val left: Float,
-    val top: Float,
+    val label: String,
+    val score: Float,
+    val boundingBox: RectF,
 )

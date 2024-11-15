@@ -34,12 +34,11 @@ fun CameraPreview(
     val cameraxSelector = CameraSelector.Builder().requireLensFacing(lensFacing).build()
 
     val imageAnalysis = ImageAnalysis.Builder()
+        .setTargetResolution(android.util.Size(300, 300))
         .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
         .build().also {
             it.setAnalyzer(cameraExecutor) { imageProxy ->
                 onImageAnalysis(imageProxy)
-                /*val rotationDegrees = imageProxy.imageInfo.rotationDegrees
-                imageProxy.close()*/
             }
         }
 
