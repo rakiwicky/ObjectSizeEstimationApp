@@ -6,7 +6,7 @@ plugins {
 
 android {
     namespace = "com.au.library_ui_compose"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         minSdk = 21

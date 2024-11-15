@@ -5,7 +5,7 @@ plugins {
 
 android {
     namespace = "com.au.library_tensorflow"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         minSdk = 21
@@ -44,6 +44,8 @@ dependencies {
     implementation(libs.tensorflow.lite.gpu)
 
     testImplementation(libs.junit)
+    testImplementation(libs.mockito.kotlin)
+    testImplementation(libs.mockito.core)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
 }

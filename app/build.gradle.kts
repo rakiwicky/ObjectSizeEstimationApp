@@ -7,7 +7,7 @@ plugins {
 
 android {
     namespace = "com.au.objectsizeestimation"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.au.objectsizeestimation"
@@ -56,7 +56,6 @@ dependencies {
     implementation(project(":library-ui-compose"))
     implementation(project(":library-tensorflow"))
     implementation(libs.androidx.runtime.livedata)
-    implementation(libs.androidx.ui.graphics.android)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
