@@ -4,12 +4,11 @@ import android.content.res.Resources
 import androidx.camera.core.ImageProxy
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import com.au.objectsizeestimation.internal.MainViewStateBinding.Layout
 import com.au.objectsizeestimation.R
+import com.au.objectsizeestimation.internal.MainViewStateBinding.Layout
 import com.au.objectsizeestimation.internal.ui.Classification
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
-import org.tensorflow.lite.task.vision.detector.Detection
 
 internal class MainViewState @AssistedInject constructor(
     resources: Resources,

@@ -39,10 +39,16 @@ android {
         compose = true
         mlModelBinding = true
     }
+
+    testOptions {
+        animationsDisabled = true
+        unitTests.isIncludeAndroidResources = true
+    }
 }
 
 dependencies {
 
+    implementation(libs.androidx.annotation)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
@@ -52,24 +58,12 @@ dependencies {
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
     implementation(libs.androidx.core)
-    implementation(project(":library-mvvm"))
-    implementation(project(":library-ui-compose"))
-    implementation(project(":library-tensorflow"))
     implementation(libs.androidx.runtime.livedata)
-
-    testImplementation(libs.junit)
-    androidTestImplementation(libs.androidx.junit)
-    androidTestImplementation(libs.androidx.espresso.core)
-    androidTestImplementation(platform(libs.androidx.compose.bom))
-    androidTestImplementation(libs.androidx.ui.test.junit4)
-    debugImplementation(libs.androidx.ui.tooling)
-    debugImplementation(libs.androidx.ui.test.manifest)
 
     implementation(libs.androidx.camera.core)
     implementation(libs.androidx.camera.camera2)
     implementation(libs.androidx.camera.lifecycle)
     implementation(libs.androidx.camera.video)
-
     implementation(libs.androidx.camera.view)
     implementation(libs.androidx.camera.extensions)
 
@@ -80,6 +74,25 @@ dependencies {
     implementation(libs.dagger.core)
     implementation(libs.dagger.android.core)
     implementation(libs.dagger.android.support)
+
+    implementation(project(":library-mvvm"))
+    implementation(project(":library-ui-compose"))
+    implementation(project(":library-tensorflow"))
+    implementation(project(":library-android-test"))
+
+    testImplementation(libs.junit)
+    testImplementation(libs.androidx.junit)
+    testImplementation(libs.robolectric.robolectric)
+    testImplementation(libs.mockito.kotlin)
+    testImplementation(libs.mockito.core)
+    testImplementation(libs.google.truth)
+    androidTestImplementation(libs.androidx.junit)
+    androidTestImplementation(libs.androidx.espresso.core)
+    androidTestImplementation(platform(libs.androidx.compose.bom))
+    androidTestImplementation(libs.androidx.ui.test.junit4)
+    debugImplementation(libs.androidx.ui.tooling)
+    debugImplementation(libs.androidx.ui.test.manifest)
+
     kapt(libs.dagger.compiler)
     kapt(libs.dagger.android.processor)
 }

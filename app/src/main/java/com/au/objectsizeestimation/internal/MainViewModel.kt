@@ -5,6 +5,8 @@ import androidx.lifecycle.viewModelScope
 import com.au.library_mvvm.BaseViewModel
 import com.au.library_tensorflow.TensorFlowInteractor
 import com.au.objectsizeestimation.internal.MainViewState.TargetState
+import com.au.objectsizeestimation.internal.mapper.DetectionDetailsMapper
+import com.au.objectsizeestimation.internal.util.PermissionHelper
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext

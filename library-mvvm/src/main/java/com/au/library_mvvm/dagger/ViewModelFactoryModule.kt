@@ -6,6 +6,7 @@ import dagger.Binds
 import dagger.Module
 
 @Module
+@Suppress("unused")
 abstract class ViewModelFactoryModule {
     @Binds abstract fun viewModelFactory(viewModelFactory: ViewModelFactory): ViewModelProvider.Factory
 }

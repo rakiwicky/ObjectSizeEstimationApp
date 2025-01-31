@@ -24,7 +24,9 @@ internal class TensorFlowObjectDetector @Inject constructor(
     }
 
     private fun setupObjectDetector() {
-        val baseOptions = BaseOptions.builder().setNumThreads(NUMBER_OF_THREADS).build()
+        val baseOptions = BaseOptions.builder()
+            .setNumThreads(NUMBER_OF_THREADS)
+            .build()
 
         val options = ObjectDetector.ObjectDetectorOptions.builder()
             .setBaseOptions(baseOptions)

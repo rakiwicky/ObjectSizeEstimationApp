@@ -3,6 +3,7 @@ package com.au.objectsizeestimation.internal
 import android.Manifest
 import android.os.Bundle
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts.RequestPermission
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
@@ -31,7 +32,8 @@ import com.au.objectsizeestimation.internal.MainViewStateBinding.Layout
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
-internal class MainActivity : ComposeBaseViewModelActivity<MainViewModel>(MainViewModel::class.java) {
+internal class MainActivity :
+    ComposeBaseViewModelActivity<MainViewModel>(MainViewModel::class.java) {
 
     private lateinit var cameraExecutor: ExecutorService
 
@@ -40,67 +42,12 @@ internal class MainActivity : ComposeBaseViewModelActivity<MainViewModel>(MainVi
     }
 
     override val content: @Composable () -> Unit = {
-        viewModel.binding.observeAsState().value?.let{
-            ObjectSizeEstimationAppTheme {
-                Box(modifier = Modifier.fillMaxSize()) {
-                    when(it.layout) {
-                        is Layout.Permission -> {
-                            cameraPermissionRequest.launch(Manifest.permission.CAMERA)
-                        }
-
-                        is Layout.Camera -> {
-                            cameraExecutor = Executors.newSingleThreadExecutor()
-                            Screen(
-                                cameraExecutor = cameraExecutor,
-                                layout = it.layout,
-                            )
-
-                            it.layout.listDetected?.forEach { classification ->
-                                Canvas(
-                                    modifier = Modifier.fillMaxSize(),
-                                    onDraw = {
-                                        drawRect(
-                                            color = Color.Red,
-                                            topLeft = Offset(
-                                                x = classification.boundingBox.left,
-                                                y = classification.boundingBox.top,
-                                            ),
-                                            size = Size(
-                                                classification.boundingBox.width(),
-                                                classification.boundingBox.height()
-                                            ),
-                                            style = Stroke(
-                                                width = 10f,
-                                            )
-                                        )
-                                    }
-                                )
-
-                                Column(
-                                    modifier = Modifier.align(Alignment.BottomCenter).background(Color.White).fillMaxWidth(),
-                                    verticalArrangement = Arrangement.Bottom,
-                                ) {
-                                    Text(
-                                        text = classification.label,
-                                        modifier = Modifier.fillMaxWidth(),
-                                        textAlign = TextAlign.Center,
-                                        color = Color.Red,
-                                    )
-
-                                    Spacer(modifier = Modifier.height(8.dp))
-
-                                    Text(
-                                        text = classification.score.toString(),
-                                        modifier = Modifier.fillMaxWidth(),
-                                        textAlign = TextAlign.Center,
-                                        color = Color.Red,
-                                    )
-                                }
-                            }
-                        }
-                    }
-                }
-            }
+        viewModel.binding.observeAsState().value?.let {
+            Content(
+                binding = it,
+                cameraExecutor = Executors.newSingleThreadExecutor(),
+                cameraPermissionRequest = cameraPermissionRequest
+            )
         }
     }
 
@@ -116,7 +63,77 @@ internal class MainActivity : ComposeBaseViewModelActivity<MainViewModel>(MainVi
 }
 
 @Composable
-private fun Screen(layout: Layout.Camera, cameraExecutor: ExecutorService) {
+private fun Content(
+    binding: MainViewStateBinding,
+    cameraExecutor: ExecutorService,
+    cameraPermissionRequest: ActivityResultLauncher<String>
+) {
+    ObjectSizeEstimationAppTheme {
+        Box(modifier = Modifier.fillMaxSize()) {
+            when (binding.layout) {
+                is Layout.Permission -> {
+                    cameraPermissionRequest.launch(Manifest.permission.CAMERA)
+                }
+
+                is Layout.Camera -> {
+                    Camera(
+                        cameraExecutor = cameraExecutor,
+                        layout = binding.layout,
+                    )
+
+                    binding.layout.listDetected?.forEach { classification ->
+                        Canvas(
+                            modifier = Modifier.fillMaxSize(),
+                            onDraw = {
+                                drawRect(
+                                    color = Color.Red,
+                                    topLeft = Offset(
+                                        x = classification.boundingBox.left,
+                                        y = classification.boundingBox.top,
+                                    ),
+                                    size = Size(
+                                        classification.boundingBox.width(),
+                                        classification.boundingBox.height()
+                                    ),
+                                    style = Stroke(
+                                        width = 10f,
+                                    )
+                                )
+                            }
+                        )
+
+                        Column(
+                            modifier = Modifier
+                                .align(Alignment.BottomCenter)
+                                .background(Color.White)
+                                .fillMaxWidth(),
+                            verticalArrangement = Arrangement.Bottom,
+                        ) {
+                            Text(
+                                text = classification.label,
+                                modifier = Modifier.fillMaxWidth(),
+                                textAlign = TextAlign.Center,
+                                color = Color.Red,
+                            )
+
+                            Spacer(modifier = Modifier.height(8.dp))
+
+                            Text(
+                                text = classification.score.toString(),
+                                modifier = Modifier.fillMaxWidth(),
+                                textAlign = TextAlign.Center,
+                                color = Color.Red,
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun Camera(layout: Layout.Camera, cameraExecutor: ExecutorService) {
     CameraPreview(
         cameraExecutor = cameraExecutor,
         onImageAnalysis = layout.onImageAnalysis,

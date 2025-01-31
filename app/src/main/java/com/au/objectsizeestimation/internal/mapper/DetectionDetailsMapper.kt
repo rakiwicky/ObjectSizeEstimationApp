@@ -1,4 +1,4 @@
-package com.au.objectsizeestimation.internal
+package com.au.objectsizeestimation.internal.mapper
 
 import com.au.objectsizeestimation.internal.ui.Classification
 import org.tensorflow.lite.task.vision.detector.Detection
