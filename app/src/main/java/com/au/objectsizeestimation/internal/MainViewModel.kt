@@ -50,7 +50,7 @@ internal class MainViewModel @Inject constructor(
     }
 
     private fun onImageAnalysis(imageProxy: ImageProxy) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.Default) {
             try {
                 val bitmap = imageProxy.toBitmap()
                 val listOfDetections = tensorFlowInteractor.detectObjects(bitmap)

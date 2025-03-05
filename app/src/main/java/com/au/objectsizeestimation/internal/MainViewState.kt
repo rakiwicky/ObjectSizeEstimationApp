@@ -4,6 +4,7 @@ import android.content.res.Resources
 import androidx.camera.core.ImageProxy
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import com.au.library_mvvm.getNonNullValue
 import com.au.objectsizeestimation.R
 import com.au.objectsizeestimation.internal.MainViewStateBinding.Layout
 import com.au.objectsizeestimation.internal.ui.Classification
@@ -24,7 +25,7 @@ internal class MainViewState @AssistedInject constructor(
     val binding: LiveData<MainViewStateBinding> = _binding
 
     fun moveTo(targetState: TargetState) {
-        val currentTargetState = _binding.value!!
+        val currentTargetState = _binding.getNonNullValue()
 
         _binding.value = when (targetState) {
             is TargetState.Permission -> currentTargetState.copy(
