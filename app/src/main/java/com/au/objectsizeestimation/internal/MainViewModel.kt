@@ -4,6 +4,7 @@ import androidx.camera.core.ImageProxy
 import androidx.lifecycle.viewModelScope
 import com.au.library_mvvm.BaseViewModel
 import com.au.library_tensorflow.TensorFlowInteractor
+import com.au.objectsizeestimation.internal.MainViewState.OverlayState
 import com.au.objectsizeestimation.internal.MainViewState.TargetState
 import com.au.objectsizeestimation.internal.mapper.DetectionDetailsMapper
 import com.au.objectsizeestimation.internal.util.PermissionHelper
@@ -56,14 +57,17 @@ internal class MainViewModel @Inject constructor(
                 val listOfDetections = tensorFlowInteractor.detectObjects(bitmap)
 
                 withContext(Dispatchers.Main) {
-                    viewState.moveTo(
-                        TargetState.Camera(
-                            onImageAnalysis = ::onImageAnalysis,
-                            listDetected = detectionDetailsMapper.create(
-                                listOfDetections,
+                    if (listOfDetections.isEmpty()) {
+                        viewState.setOverlayState(OverlayState.None)
+                    } else {
+                        viewState.setOverlayState(
+                            OverlayState.Results(
+                                listDetected = detectionDetailsMapper.create(
+                                    listOfDetections,
+                                )
                             )
                         )
-                    )
+                    }
                 }
             } catch (e: Exception) {
                 //TODO - handle error

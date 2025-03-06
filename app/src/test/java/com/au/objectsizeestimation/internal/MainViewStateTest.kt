@@ -4,8 +4,11 @@ import androidx.camera.core.ImageProxy
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.au.library.android.test.applicationResources
 import com.au.library_mvvm.getNonNullValue
+import com.au.objectsizeestimation.internal.MainViewState.OverlayState
 import com.google.common.truth.Truth.assertThat
 import com.au.objectsizeestimation.internal.MainViewState.TargetState
+import com.au.objectsizeestimation.internal.MainViewStateBinding.Layout
+import com.au.objectsizeestimation.internal.MainViewStateBinding.Overlay
 import com.au.objectsizeestimation.internal.ui.Classification
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -26,7 +29,10 @@ class MainViewStateTest {
         assertThat(binding).isEqualTo(
             MainViewStateBinding(
                 title = "Object Size Estimation App",
-                layout = MainViewStateBinding.Layout.Permission
+                layout = Layout.Permission,
+                overlay = Overlay.None(
+                    message = "Nothing detected!"
+                )
             )
         )
     }
@@ -35,27 +41,37 @@ class MainViewStateTest {
         viewState.moveTo(TargetState.Permission)
 
         assertThat(viewState.binding.getNonNullValue().layout).isEqualTo(
-            MainViewStateBinding.Layout.Permission
+            Layout.Permission
         )
     }
 
-    @Test fun `moveTo - camera state with no image analysis results - verify`() {
-        viewState.moveTo(TargetState.Camera(onImageAnalysis, null))
+    @Test fun `moveTo - camera state - verify`() {
+        viewState.moveTo(TargetState.Camera(onImageAnalysis))
 
         assertThat(viewState.binding.getNonNullValue().layout).isEqualTo(
-            MainViewStateBinding.Layout.Camera(
-                onImageAnalysis = onImageAnalysis,
-                listDetected = null
+            Layout.Camera(
+                onImageAnalysis = onImageAnalysis
             )
         )
     }
 
-    @Test fun `moveTo - camera state with image analysis results - verify`() {
-        viewState.moveTo(TargetState.Camera(onImageAnalysis, listDetected))
+    @Test fun `setOverlayState - none state - verify`() {
+        viewState.setOverlayState(OverlayState.None)
 
-        assertThat(viewState.binding.getNonNullValue().layout).isEqualTo(
-            MainViewStateBinding.Layout.Camera(
-                onImageAnalysis = onImageAnalysis,
+        assertThat(viewState.binding.getNonNullValue().overlay).isEqualTo(
+            Overlay.None(
+                message = "Nothing detected!"
+            )
+        )
+    }
+
+    @Test fun `setOverlayState - results state - verify`() {
+        viewState.setOverlayState(OverlayState.Results(
+            listDetected = listDetected
+        ))
+
+        assertThat(viewState.binding.getNonNullValue().overlay).isEqualTo(
+            Overlay.Results(
                 listDetected = listDetected
             )
         )

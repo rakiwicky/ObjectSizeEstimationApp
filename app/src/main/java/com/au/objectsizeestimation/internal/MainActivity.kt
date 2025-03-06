@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.livedata.observeAsState
@@ -21,7 +22,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -29,6 +29,7 @@ import com.au.library_mvvm.ComposeBaseViewModelActivity
 import com.au.library_ui_compose.theme.ObjectSizeEstimationAppTheme
 import com.au.library_ui_compose.ui.CameraPreview
 import com.au.objectsizeestimation.internal.MainViewStateBinding.Layout
+import com.au.objectsizeestimation.internal.MainViewStateBinding.Overlay
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
@@ -80,13 +81,18 @@ private fun Content(
                         cameraExecutor = cameraExecutor,
                         layout = binding.layout,
                     )
+                }
+            }
 
-                    binding.layout.listDetected?.forEach { classification ->
+            when (binding.overlay) {
+                is Overlay.Results -> {
+                    binding.overlay.listDetected.forEach { classification ->
+                        val outlineColor = MaterialTheme.colorScheme.outline
                         Canvas(
                             modifier = Modifier.fillMaxSize(),
                             onDraw = {
                                 drawRect(
-                                    color = Color.Red,
+                                    color = outlineColor,
                                     topLeft = Offset(
                                         x = classification.boundingBox.left,
                                         y = classification.boundingBox.top,
@@ -105,7 +111,7 @@ private fun Content(
                         Column(
                             modifier = Modifier
                                 .align(Alignment.BottomCenter)
-                                .background(Color.White)
+                                .background(MaterialTheme.colorScheme.background)
                                 .fillMaxWidth(),
                             verticalArrangement = Arrangement.Bottom,
                         ) {
@@ -113,7 +119,8 @@ private fun Content(
                                 text = classification.label,
                                 modifier = Modifier.fillMaxWidth(),
                                 textAlign = TextAlign.Center,
-                                color = Color.Red,
+                                color = MaterialTheme.colorScheme.onPrimary,
+                                style = MaterialTheme.typography.bodyMedium
                             )
 
                             Spacer(modifier = Modifier.height(8.dp))
@@ -122,9 +129,28 @@ private fun Content(
                                 text = classification.score.toString(),
                                 modifier = Modifier.fillMaxWidth(),
                                 textAlign = TextAlign.Center,
-                                color = Color.Red,
+                                color = MaterialTheme.colorScheme.onPrimary,
+                                style = MaterialTheme.typography.bodySmall
                             )
                         }
+                    }
+                }
+
+                is Overlay.None -> {
+                    Column(
+                        modifier = Modifier
+                            .align(Alignment.BottomCenter)
+                            .background(MaterialTheme.colorScheme.background)
+                            .fillMaxWidth(),
+                        verticalArrangement = Arrangement.Bottom,
+                    ) {
+                        Text(
+                            text = binding.overlay.message,
+                            modifier = Modifier.fillMaxWidth(),
+                            textAlign = TextAlign.Center,
+                            color = MaterialTheme.colorScheme.onPrimary,
+                            style = MaterialTheme.typography.bodyMedium
+                        )
                     }
                 }
             }

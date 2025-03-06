@@ -7,18 +7,22 @@ import androidx.lifecycle.MutableLiveData
 import com.au.library_mvvm.getNonNullValue
 import com.au.objectsizeestimation.R
 import com.au.objectsizeestimation.internal.MainViewStateBinding.Layout
+import com.au.objectsizeestimation.internal.MainViewStateBinding.Overlay
 import com.au.objectsizeestimation.internal.ui.Classification
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 
 internal class MainViewState @AssistedInject constructor(
-    resources: Resources,
+    private val resources: Resources,
 ) {
 
     private val _binding = MutableLiveData(
         MainViewStateBinding(
             title = resources.getString(R.string.app_name),
-            layout = Layout.Permission
+            layout = Layout.Permission,
+            overlay = Overlay.None(
+                message = resources.getString(R.string.no_detection),
+            ),
         )
     )
 
@@ -35,7 +39,24 @@ internal class MainViewState @AssistedInject constructor(
             is TargetState.Camera -> currentTargetState.copy(
                 layout = Layout.Camera(
                     onImageAnalysis = targetState.onImageAnalysis,
-                    listDetected = targetState.listDetected,
+                )
+            )
+        }
+    }
+
+    fun setOverlayState(overlayState: OverlayState) {
+        val currentTargetState = _binding.getNonNullValue()
+
+        _binding.value = when (overlayState) {
+            is OverlayState.None -> currentTargetState.copy(
+                overlay = Overlay.None(
+                    message = resources.getString(R.string.no_detection),
+                )
+            )
+
+            is OverlayState.Results -> currentTargetState.copy(
+                overlay = Overlay.Results(
+                    listDetected = overlayState.listDetected,
                 )
             )
         }
@@ -51,7 +72,16 @@ internal class MainViewState @AssistedInject constructor(
 
         data class Camera(
             val onImageAnalysis: (ImageProxy) -> Unit,
-            val listDetected: List<Classification>? = null,
         ) : TargetState()
+
+        //TODO - handle error
+    }
+
+    sealed class OverlayState {
+        data object None : OverlayState()
+
+        data class Results(
+            val listDetected: List<Classification>,
+        ) : OverlayState()
     }
 }

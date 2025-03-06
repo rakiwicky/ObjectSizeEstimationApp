@@ -5,12 +5,12 @@ import androidx.camera.core.ImageProxy
 import androidx.lifecycle.MutableLiveData
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.au.library_tensorflow.TensorFlowInteractor
+import com.au.objectsizeestimation.internal.MainViewState.OverlayState
 import com.au.objectsizeestimation.internal.MainViewState.TargetState
 import com.au.objectsizeestimation.internal.mapper.DetectionDetailsMapper
 import com.au.objectsizeestimation.internal.ui.Classification
 import com.au.objectsizeestimation.internal.util.PermissionHelper
 import com.google.common.truth.Truth.assertThat
-import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
@@ -111,6 +111,35 @@ class MainViewModelTest {
     }
 
     @Test
+    fun `init - with camera permission and no results detected - verify state`() = runTest {
+        val imageProxy = mock<ImageProxy> {
+            on { toBitmap() } doReturn mock()
+        }
+
+        lateinit var onImageAnalysis: (ImageProxy) -> Unit
+        whenever(permissionHelper.hasCameraPermission()).thenReturn(true)
+        whenever(viewState.moveTo(argForWhich {
+            (this as? TargetState.Camera)?.let {
+                onImageAnalysis = it.onImageAnalysis
+                true
+            } == true
+        })).thenAnswer {}
+        whenever(tensorFlowInteractor.detectObjects(any())).thenReturn(listOf<Detection>())
+
+        viewModel
+
+        onImageAnalysis(imageProxy)
+
+        inOrder(viewState) {
+            verify(viewState).binding
+            verify(viewState).setOverlayState(
+                OverlayState.None
+            )
+            verifyNoMoreInteractions()
+        }
+    }
+
+    @Test
     fun `init - with camera permission and results detected - verify state`() = runTest {
         val imageProxy = mock<ImageProxy> {
             on { toBitmap() } doReturn mock()
@@ -155,9 +184,8 @@ class MainViewModelTest {
 
         inOrder(viewState) {
             verify(viewState).binding
-            verify(viewState).moveTo(
-                TargetState.Camera(
-                    onImageAnalysis = onImageAnalysis,
+            verify(viewState).setOverlayState(
+                OverlayState.Results(
                     listDetected = classificationList
                 )
             )
