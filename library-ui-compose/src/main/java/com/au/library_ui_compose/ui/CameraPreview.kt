@@ -4,12 +4,10 @@ import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.ImageProxy
 import androidx.camera.view.PreviewView
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.LocalLifecycleOwner
@@ -28,36 +26,38 @@ fun CameraPreview(
     val lifecycleOwner = LocalLifecycleOwner.current
     val context = LocalContext.current
     val preview = Builder().build()
-    val previewView = remember {
-        PreviewView(context)
+    val previewView = remember { PreviewView(context) }
+
+    val cameraxSelector = remember {
+        CameraSelector.Builder().requireLensFacing(lensFacing).build()
     }
-    val cameraxSelector = CameraSelector.Builder().requireLensFacing(lensFacing).build()
 
-    val imageAnalysis = ImageAnalysis.Builder()
-        .setTargetResolution(android.util.Size(300, 300))
-        .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
-        .build().also {
-            it.setAnalyzer(cameraExecutor) { imageProxy ->
-                onImageAnalysis(imageProxy)
-            }
+    val imageAnalysis = remember {
+        ImageAnalysis.Builder()
+            .setTargetResolution(android.util.Size(300, 300))
+            .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
+            .build()
+    }.apply {
+        setAnalyzer(cameraExecutor) { imageProxy ->
+            onImageAnalysis(imageProxy)
         }
-
+    }
 
     LaunchedEffect(lensFacing) {
         val cameraProvider = ProcessCameraProvider.getInstance(context).get()
         cameraProvider.unbindAll()
-        cameraProvider.bindToLifecycle(lifecycleOwner, cameraxSelector, preview, imageAnalysis)
+        cameraProvider.bindToLifecycle(
+            lifecycleOwner,
+            cameraxSelector,
+            preview,
+            imageAnalysis
+        )
         preview.surfaceProvider = previewView.surfaceProvider
     }
 
-    Box(
-        contentAlignment = Alignment.Center,
+    AndroidView(
+        factory = { previewView },
         modifier = Modifier.fillMaxSize()
-    ) {
-        AndroidView(
-            factory = { previewView },
-            modifier = Modifier.fillMaxSize()
-        )
-    }
+    )
 }
 
