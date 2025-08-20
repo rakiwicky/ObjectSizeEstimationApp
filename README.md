@@ -5,7 +5,7 @@ Design Pattern/Architecture
 - MVVM
 
 UI
-- Jetpack Compose)
+- Jetpack Compose
 
 DI
 - Dagger2
